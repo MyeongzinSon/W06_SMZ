@@ -124,6 +124,10 @@ public class PlayerMove : MonoBehaviour
         targetSpeed = SpeedModifier * rollDistance / rollDuration;
         targetVelocity = direction * targetSpeed;
     }
+    public void ApplyStiff()
+    {
+        playerRigidbody.velocity = rollDirection.normalized * (speed * -2);
+    }
     public void EndRoll()
     {
         if (!IsRolling) { return; }

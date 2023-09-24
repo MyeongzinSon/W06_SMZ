@@ -7,6 +7,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     [SerializeField] int maxHealth;
     [SerializeField] float invunerableDuration;
     PlayerController player;
+    PlayerMove playerMove;
     PlayerAnimation playerAnimation;
 
     int _currentHealth;
@@ -28,6 +29,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     void Awake()
     {
         player = GetComponent<PlayerController>();
+        playerMove = GetComponent<PlayerMove>();
         playerAnimation = GetComponent<PlayerAnimation>();
     }
     void Start()
@@ -50,6 +52,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         if (IsAlive && !IsInvunerable)
         {
             CurrentHealth -= value;
+            playerMove.ApplyStiff();
             if (IsAlive)
             {
                 StartInvunerable();
