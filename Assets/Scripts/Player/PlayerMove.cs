@@ -6,9 +6,12 @@ public class PlayerMove : MonoBehaviour
 {
     [Header("Move")]
     [SerializeField] float speed;
+    [SerializeField] float accelDuration;
+    [SerializeField] float decelDuration;
     [Header("Roll")]
     [SerializeField] float rollDistance;
     [SerializeField] float rollDuration;
+    [SerializeField] float rollDecelDuration;
 
     PlayerController player;
     PlayerAction action;
@@ -17,10 +20,15 @@ public class PlayerMove : MonoBehaviour
     Vector2 moveDirection;
     Vector2 rollDirection;
     float rollStartTime;
+    Vector2 targetVelocity;
+    Vector2 acceleration;
+    Vector2 deceleration;
+    float targetSpeed;
 
     public bool CanMove { get; set; }
     public bool IsRollEnded { get; private set; }
     public float SpeedModifier { get; private set; }
+    public Vector2 CurrentVelocity => playerRigidbody.velocity;
     public bool IsMoving => playerRigidbody.velocity.magnitude > 0;
     public bool IsRolling => player.CurrentState == PlayerState.Roll;
     
@@ -52,10 +60,13 @@ public class PlayerMove : MonoBehaviour
             case PlayerState.Action: FixedUpdateAction(); break;
             case PlayerState.Death: FixedUpdateDeath(); break;
         }
+
+        SetVelocity();
     }
     void FixedUpdateIdle()
     {
-        playerRigidbody.velocity = moveDirection * FinalSpeed;
+        targetSpeed = FinalSpeed;
+        targetVelocity = moveDirection * targetSpeed;
     }
     void FixedUpdateRoll()
     {
@@ -66,13 +77,34 @@ public class PlayerMove : MonoBehaviour
     }
     void FixedUpdateAction()
     {
-        var actionMuliplier = action.CurrentAction.MoveSpeedMultiplier;
-        playerRigidbody.velocity = moveDirection * FinalSpeed * actionMuliplier;
+        targetSpeed = FinalSpeed * action.CurrentAction.MoveSpeedMultiplier;
+        targetVelocity = moveDirection * targetSpeed;
     }
     void FixedUpdateDeath()
     {
     }
 
+    void SetVelocity()
+    {
+        acceleration = (targetVelocity - CurrentVelocity).normalized * (targetSpeed * Time.fixedDeltaTime / accelDuration);
+        deceleration = acceleration * (accelDuration / decelDuration);
+
+        if (Vector2.Dot(targetVelocity, CurrentVelocity) <= 0)
+        {
+            playerRigidbody.velocity += deceleration;
+        }
+
+        playerRigidbody.velocity += acceleration;
+        if (CurrentVelocity.magnitude > targetSpeed)
+        {
+            playerRigidbody.velocity = CurrentVelocity.normalized * targetSpeed;
+        }
+        if (CurrentVelocity.magnitude < acceleration.magnitude / 2)
+        {
+            playerRigidbody.velocity = Vector2.zero;
+        }
+        Debug.Log(CurrentVelocity);
+    }
 
     public void SetDireciton(Vector2 direction)
     {
@@ -88,8 +120,8 @@ public class PlayerMove : MonoBehaviour
     {
         rollStartTime = Time.time;
         var direction = (_direction.Equals(Vector2.zero) ? rollDirection : _direction).normalized;
-        var rollSpeed = SpeedModifier * rollDistance / rollDuration;
-        playerRigidbody.velocity = direction * (rollSpeed);
+        targetSpeed = SpeedModifier * rollDistance / rollDuration;
+        targetVelocity = direction * targetSpeed;
     }
     public void EndRoll()
     {
