@@ -135,3 +135,6 @@ MonoBehaviour:
   smoothTime: 0.33
   generalAimRatio: 1
   gamepadAimRatio: 0.9
+  standardAmplitude: 0.5
+  standardFrequency: 10000
+  standardDuration: 0.5

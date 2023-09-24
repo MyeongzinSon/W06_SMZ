@@ -16,6 +16,7 @@ public class PlayerMove : MonoBehaviour
     PlayerController player;
     PlayerAction action;
     Rigidbody2D playerRigidbody;
+    CameraController camera;
 
     Vector2 moveDirection;
     Vector2 rollDirection;
@@ -39,7 +40,8 @@ public class PlayerMove : MonoBehaviour
     {
         player = GetComponent<PlayerController>();
         action = GetComponent<PlayerAction>();
-        playerRigidbody = GetComponent<Rigidbody2D>();    
+        playerRigidbody = GetComponent<Rigidbody2D>();
+        camera = FindObjectOfType<CameraController>();
     }
     private void Start()
     {
@@ -127,6 +129,7 @@ public class PlayerMove : MonoBehaviour
     public void ApplyStiff()
     {
         playerRigidbody.velocity = rollDirection.normalized * (speed * -2);
+        camera.AddCameraVibration(-rollDirection);
     }
     public void EndRoll()
     {

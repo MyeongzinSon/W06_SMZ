@@ -4,6 +4,35 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[System.Serializable]
+public class CameraVibrationInfo
+{
+    Vector2 direction;
+    float amplitude;
+    float frequency;
+    float duration;
+
+    float currentDuration;
+    public bool isEnd => currentDuration >= duration;
+
+    public CameraVibrationInfo(Vector2 _direction, float _amplitude, float _frequency, float _duration)
+    {
+        direction = _direction;
+        amplitude = _amplitude;
+        frequency = _frequency;
+        duration = _duration;
+
+        currentDuration = 0;
+    }
+    public Vector2 OnUpdate()
+    {
+        currentDuration += Time.deltaTime;
+        return direction.normalized
+            * Mathf.Cos(frequency * currentDuration * 2 * Mathf.PI)
+            * amplitude * Mathf.Exp(-5 * currentDuration / duration);
+    }
+}
+
 public class CameraController : MonoBehaviour, PlayerInputActions.IPlayerActions
 {
     [Header("General")]
@@ -12,18 +41,24 @@ public class CameraController : MonoBehaviour, PlayerInputActions.IPlayerActions
     [Header("Aim View")]
     [SerializeField] float generalAimRatio;
     [SerializeField] float gamepadAimRatio;
+    [Header("Vibration")]
+    [SerializeField] float standardAmplitude;
+    [SerializeField] float standardFrequency;
+    [SerializeField] float standardDuration;
 
     PlayerInput inputManager;
     PlayerInputActions inputs;
     Camera camera;
     GameObject target;
 
+    List<CameraVibrationInfo> cameraVibrationInfos;
     bool onFocus;
     float mapHalfSize;
     float cameraSizeX, cameraSizeY;
     Vector3 aimVector;
     Vector3 velocity = Vector3.zero;
     Vector3 resultPosition;
+    Vector2 vibrationResult;
 
     bool IsKeyboardAndMouse => inputManager.currentControlScheme.Equals("Keyboard&Mouse");
 
@@ -40,18 +75,31 @@ public class CameraController : MonoBehaviour, PlayerInputActions.IPlayerActions
     {
         inputs.Disable();
     }
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.blue;
-        Gizmos.DrawSphere(resultPosition, 1f);
-        Gizmos.color = Color.magenta;
-        Gizmos.DrawSphere(aimVector + transform.position, 1f);
-    }
     private void Start()
     {
         target = GameManager.instance.GetPlayer();
         mapHalfSize = GameManager.MapSize / 2;
         aimVector = new();
+        cameraVibrationInfos = new();
+    }
+    void Update()
+    {
+        if (!vibrationResult.Equals(Vector2.zero))
+        {
+            transform.Translate(-vibrationResult);
+        }
+
+        vibrationResult = Vector2.zero;
+        foreach (var v in cameraVibrationInfos.ToList())
+        {
+            vibrationResult += v.OnUpdate();
+            if (v.isEnd)
+            {
+                cameraVibrationInfos.Remove(v);
+            }
+        }
+        transform.Translate(vibrationResult);
+
     }
     private void FixedUpdate()
     {
@@ -81,6 +129,15 @@ public class CameraController : MonoBehaviour, PlayerInputActions.IPlayerActions
 
             transform.position = Vector3.SmoothDamp(transform.position, resultPosition, ref velocity, smoothTime);
         }
+    }
+
+    public void AddCameraVibration(Vector2 _direction, float _amplitude, float _frequency, float _duration)
+    {
+        cameraVibrationInfos.Add(new CameraVibrationInfo(_direction, _amplitude, _frequency, _duration));
+    }
+    public void AddCameraVibration(Vector2 _direction)
+    {
+        AddCameraVibration(_direction, standardAmplitude, standardFrequency, standardDuration);
     }
     public void OnMove(InputAction.CallbackContext context)
     {
