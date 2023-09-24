@@ -40,6 +40,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "AimOnMouse",
+                    "type": "Value",
+                    "id": "4d8c77f0-bc50-4af0-b9ef-1fc8b0b61bd3",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -298,12 +307,12 @@
                 },
                 {
                     "name": "",
-                    "id": "612b11cb-d3f7-4a3f-81a6-d5a948894eb4",
+                    "id": "49a61869-8cf1-43e7-bdc0-02b61ba95447",
                     "path": "<Mouse>/position",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "Aim",
+                    "groups": "Gamepad",
+                    "action": "AimOnMouse",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

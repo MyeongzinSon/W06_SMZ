@@ -55,13 +55,14 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     public void OnAim(InputAction.CallbackContext context)
     {
         var inputVector = context.ReadValue<Vector2>();
-        if (!IsKeyboardAndMouse)
+        if (inputVector != Vector2.zero)
         {
-            if (inputVector != Vector2.zero)
-            {
-                aimDirection = inputVector.normalized;
-            }
+            aimDirection = inputVector.normalized;
         }
+    }
+    public void OnAimOnMouse(InputAction.CallbackContext context)
+    {
+        var inputVector = context.ReadValue<Vector2>();
     }
 
     void Awake()

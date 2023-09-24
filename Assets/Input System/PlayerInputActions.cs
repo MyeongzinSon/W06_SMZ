@@ -62,6 +62,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""AimOnMouse"",
+                    ""type"": ""Value"",
+                    ""id"": ""4d8c77f0-bc50-4af0-b9ef-1fc8b0b61bd3"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -320,12 +329,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""612b11cb-d3f7-4a3f-81a6-d5a948894eb4"",
+                    ""id"": ""49a61869-8cf1-43e7-bdc0-02b61ba95447"",
                     ""path"": ""<Mouse>/position"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Aim"",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""AimOnMouse"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -922,6 +931,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_Roll = m_Player.FindAction("Roll", throwIfNotFound: true);
         m_Player_Action = m_Player.FindAction("Action", throwIfNotFound: true);
         m_Player_Aim = m_Player.FindAction("Aim", throwIfNotFound: true);
+        m_Player_AimOnMouse = m_Player.FindAction("AimOnMouse", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -999,6 +1009,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Roll;
     private readonly InputAction m_Player_Action;
     private readonly InputAction m_Player_Aim;
+    private readonly InputAction m_Player_AimOnMouse;
     public struct PlayerActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -1007,6 +1018,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         public InputAction @Roll => m_Wrapper.m_Player_Roll;
         public InputAction @Action => m_Wrapper.m_Player_Action;
         public InputAction @Aim => m_Wrapper.m_Player_Aim;
+        public InputAction @AimOnMouse => m_Wrapper.m_Player_AimOnMouse;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1028,6 +1040,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Aim.started += instance.OnAim;
             @Aim.performed += instance.OnAim;
             @Aim.canceled += instance.OnAim;
+            @AimOnMouse.started += instance.OnAimOnMouse;
+            @AimOnMouse.performed += instance.OnAimOnMouse;
+            @AimOnMouse.canceled += instance.OnAimOnMouse;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1044,6 +1059,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Aim.started -= instance.OnAim;
             @Aim.performed -= instance.OnAim;
             @Aim.canceled -= instance.OnAim;
+            @AimOnMouse.started -= instance.OnAimOnMouse;
+            @AimOnMouse.performed -= instance.OnAimOnMouse;
+            @AimOnMouse.canceled -= instance.OnAimOnMouse;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1230,6 +1248,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnRoll(InputAction.CallbackContext context);
         void OnAction(InputAction.CallbackContext context);
         void OnAim(InputAction.CallbackContext context);
+        void OnAimOnMouse(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
