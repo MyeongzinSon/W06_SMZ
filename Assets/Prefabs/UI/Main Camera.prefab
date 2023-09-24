@@ -138,3 +138,7 @@ MonoBehaviour:
   standardAmplitude: 0.5
   standardFrequency: 10000
   standardDuration: 0.5
+  focusDuration: 2
+  focusAngleThreshold: 15
+  focusCameraSize: 7.5
+  focusTimeScale: 0.1

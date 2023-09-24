@@ -45,6 +45,11 @@ public class CameraController : MonoBehaviour, PlayerInputActions.IPlayerActions
     [SerializeField] float standardAmplitude;
     [SerializeField] float standardFrequency;
     [SerializeField] float standardDuration;
+    [Header("Focus")]
+    [SerializeField] float focusDuration;
+    [SerializeField] float focusAngleThreshold;
+    [SerializeField] float focusCameraSize;
+    [SerializeField] float focusTimeScale;
 
     PlayerInput inputManager;
     PlayerInputActions inputs;
@@ -52,15 +57,22 @@ public class CameraController : MonoBehaviour, PlayerInputActions.IPlayerActions
     GameObject target;
 
     List<CameraVibrationInfo> cameraVibrationInfos;
-    bool onFocus;
     float mapHalfSize;
     float cameraSizeX, cameraSizeY;
+    float defaultCameraSize;
     Vector3 aimVector;
     Vector3 velocity = Vector3.zero;
     Vector3 resultPosition;
     Vector2 vibrationResult;
+    Vector3 focusStartPosition;
+    Vector3 focusTarget;
+    float focusTimer = -1;
+    float focusAngle;
+
+
 
     bool IsKeyboardAndMouse => inputManager.currentControlScheme.Equals("Keyboard&Mouse");
+    bool onFocus => focusTimer > 0;
 
     private void Awake()
     {
@@ -98,8 +110,18 @@ public class CameraController : MonoBehaviour, PlayerInputActions.IPlayerActions
                 cameraVibrationInfos.Remove(v);
             }
         }
-        transform.Translate(vibrationResult);
 
+        if (onFocus)
+        {
+            focusTimer -= Time.unscaledDeltaTime;
+            SetFocus(focusTimer / focusDuration);
+            if (!onFocus)
+            {
+                EndFocus();
+            }
+        }
+
+        transform.Translate(vibrationResult);
     }
     private void FixedUpdate()
     {
@@ -111,11 +133,7 @@ public class CameraController : MonoBehaviour, PlayerInputActions.IPlayerActions
 
         cameraSizeY = camera.orthographicSize;
         cameraSizeX = cameraSizeY / camera.pixelHeight * camera.pixelWidth;
-        if (onFocus)
-        {
-
-        }
-        else
+        if (!onFocus)
         {
             var boundaryX = Mathf.Max(0, mapHalfSize - cameraSizeX + extraBoundarySize);
             var boundaryY = Mathf.Max(0, mapHalfSize - cameraSizeY + extraBoundarySize);
@@ -138,6 +156,35 @@ public class CameraController : MonoBehaviour, PlayerInputActions.IPlayerActions
     public void AddCameraVibration(Vector2 _direction)
     {
         AddCameraVibration(_direction, standardAmplitude, standardFrequency, standardDuration);
+    }
+    public void StartFocus(Vector3 _focusTarget)
+    {
+        if (!onFocus)
+        {
+            focusTarget = _focusTarget;
+            defaultCameraSize = camera.orthographicSize;
+            focusStartPosition = transform.position;
+            focusTimer = focusDuration;
+            focusAngle = (Random.value > 0.5 ? 1 : -1) * focusAngleThreshold;
+            //Debug.Log($"{defaultCameraSize} = {camera.orthographicSize}");
+        }
+    }
+    void EndFocus()
+    {
+        if (onFocus)
+        {
+            SetFocus(0);
+        }
+    }
+    void SetFocus(float value)
+    {
+        var t = 1 - Mathf.Pow(2 * value - 1, 4);
+        Vector3 pos = Vector2.Lerp(focusStartPosition, focusTarget, t);
+        pos.z = transform.position.z;
+        transform.position = pos;
+        transform.rotation = Quaternion.Lerp(Quaternion.identity, Quaternion.Euler(0, 0, focusAngle), t);
+        Time.timeScale = Mathf.Lerp(1, focusTimeScale, t);
+        camera.orthographicSize = Mathf.Lerp(defaultCameraSize, focusCameraSize, t);
     }
     public void OnMove(InputAction.CallbackContext context)
     {

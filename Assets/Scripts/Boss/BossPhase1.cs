@@ -19,6 +19,7 @@ public class BossPhase1 : Boss
     {
         if (isDeal)
         {
+            FindObjectOfType<CameraController>().StartFocus(transform.position);
             ResetStatusOnNextPhase();
             UIManager.Instance.SetBossHP(nowBossHP);
             GameManager.instance.SetBoss(nextBossPhase.gameObject);
