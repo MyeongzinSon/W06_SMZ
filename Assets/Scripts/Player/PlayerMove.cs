@@ -103,7 +103,7 @@ public class PlayerMove : MonoBehaviour
         {
             playerRigidbody.velocity = Vector2.zero;
         }
-        Debug.Log(CurrentVelocity);
+        //Debug.Log(CurrentVelocity);
     }
 
     public void SetDireciton(Vector2 direction)
