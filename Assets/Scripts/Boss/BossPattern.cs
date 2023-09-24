@@ -30,7 +30,7 @@ public abstract class BossPattern : MonoBehaviour
 		PlayAnimation();
 		yield return waitpreDelay;
 		main.GetComponent<Collider2D>().enabled = true;
-		Debug.Log($"Pattern:Act({GetInstanceID()})");
+		//Debug.Log($"Pattern:Act({GetInstanceID()})");
 		ActionContext();
 		yield return waitpostDelay;
 		PostProcessing();
