@@ -153,6 +153,10 @@ public class CameraController : MonoBehaviour, PlayerInputActions.IPlayerActions
     {
         cameraVibrationInfos.Add(new CameraVibrationInfo(_direction, _amplitude, _frequency, _duration));
     }
+    public void AddCameraVibration(Vector2 _direction, float _coefficient)
+    {
+        AddCameraVibration(_direction, standardAmplitude * _coefficient, standardFrequency, standardDuration * _coefficient);
+    }
     public void AddCameraVibration(Vector2 _direction)
     {
         AddCameraVibration(_direction, standardAmplitude, standardFrequency, standardDuration);

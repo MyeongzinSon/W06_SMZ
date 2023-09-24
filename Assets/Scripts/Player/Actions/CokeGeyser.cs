@@ -8,8 +8,10 @@ public class CokeGeyser : MonoBehaviour
     [Header("Coke Can Object")]
     [SerializeField] GameObject cokeObject;
 
-    new BoxCollider2D boxCollider;
-    new PolygonCollider2D polygonCollider;
+    CameraController camera;
+
+    BoxCollider2D boxCollider;
+    PolygonCollider2D polygonCollider;
     LayerMask targetLayer;
     List<IDamageable> damaged;
     Vector3 currentDirection;
@@ -22,6 +24,7 @@ public class CokeGeyser : MonoBehaviour
     {
         boxCollider = GetComponent<BoxCollider2D>();
         polygonCollider = GetComponent<PolygonCollider2D>();
+        camera = FindObjectOfType<CameraController>();
         defaultColliderSize = boxCollider.size;
         boxCollider.enabled = false;
         damaged = new();
@@ -70,11 +73,13 @@ public class CokeGeyser : MonoBehaviour
         SetGeyser(startPoint, length);
 
         overlapResult.
-            Select(c => c.GetComponent<IDamageable>()).
-            Where(d => d != null && !damaged.Contains(d)).
-            ForEach((d) =>
+            //Select(c => c.GetComponent<IDamageable>()).
+            Where(c => c.TryGetComponent<IDamageable>(out var d) && !damaged.Contains(d)).
+            ForEach(c =>
         {
+            var d = c.GetComponent<IDamageable>();
             d.OnDamage();
+            camera.AddCameraVibration(currentDirection, 0.5f);
             damaged.Add(d);
         });
 

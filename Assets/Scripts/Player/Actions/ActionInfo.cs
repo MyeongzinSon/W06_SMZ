@@ -10,6 +10,7 @@ public abstract class ActionInfo : MonoBehaviour
     [SerializeField] protected bool canActionCancelRoll;
 
     protected PlayerController player;
+    protected CameraController camera;
     protected Vector2 aimDirection;
 
     public float MoveSpeedMultiplier => moveSpeedMultiplier;
@@ -22,6 +23,7 @@ public abstract class ActionInfo : MonoBehaviour
     protected virtual void Awake()
     {
         player = transform.parent.GetComponent<PlayerController>();
+        camera = FindObjectOfType<CameraController>();
     }
     protected virtual void Start()
     {
