@@ -135,7 +135,7 @@ public abstract class Boss : MonoBehaviour, IDamageable
 		Initialize();
 		bossCollider = GetComponent<Collider2D>();
 	}
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
         if (isDeal && collision.TryGetComponent<PlayerHealth>(out var playerHealth))
         {
