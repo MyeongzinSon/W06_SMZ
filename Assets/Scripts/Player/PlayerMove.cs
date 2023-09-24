@@ -86,19 +86,19 @@ public class PlayerMove : MonoBehaviour
 
     void SetVelocity()
     {
-        acceleration = (targetVelocity - CurrentVelocity).normalized * (targetSpeed * Time.fixedDeltaTime / accelDuration);
+        acceleration = (targetVelocity - CurrentVelocity).normalized * (FinalSpeed * Time.fixedDeltaTime / accelDuration);
         deceleration = acceleration * (accelDuration / decelDuration);
 
-        if (Vector2.Dot(targetVelocity, CurrentVelocity) <= 0)
+        if (Vector2.Dot(targetVelocity, CurrentVelocity) < 0)
         {
             playerRigidbody.velocity += deceleration;
         }
 
         playerRigidbody.velocity += acceleration;
-        if (CurrentVelocity.magnitude > targetSpeed)
-        {
-            playerRigidbody.velocity = CurrentVelocity.normalized * targetSpeed;
-        }
+        //if (targetSpeed > 0 && CurrentVelocity.magnitude > targetSpeed)
+        //{
+        //    playerRigidbody.velocity = CurrentVelocity.normalized * targetSpeed;
+        //}
         if (CurrentVelocity.magnitude < acceleration.magnitude / 2)
         {
             playerRigidbody.velocity = Vector2.zero;
@@ -120,6 +120,7 @@ public class PlayerMove : MonoBehaviour
     {
         rollStartTime = Time.time;
         var direction = (_direction.Equals(Vector2.zero) ? rollDirection : _direction).normalized;
+        playerRigidbody.velocity = direction * FinalSpeed;
         targetSpeed = SpeedModifier * rollDistance / rollDuration;
         targetVelocity = direction * targetSpeed;
     }
