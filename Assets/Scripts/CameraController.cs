@@ -96,6 +96,27 @@ public class CameraController : MonoBehaviour, PlayerInputActions.IPlayerActions
     }
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            float random = Random.Range(0f, 2 * Mathf.PI);
+            AddCameraVibration(new Vector2(Mathf.Cos(random), Mathf.Sin(random)));
+        }
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            AddCameraVibration(Vector2.up);
+        }
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            AddCameraVibration(Vector2.left);
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            AddCameraVibration(Vector2.down);
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            AddCameraVibration(Vector2.right);
+        }
         if (!vibrationResult.Equals(Vector2.zero))
         {
             transform.Translate(-vibrationResult);
